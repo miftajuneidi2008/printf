@@ -1,50 +1,75 @@
-#include "main.h"
-
+#include "holberton.h"
 /**
- * _printf - prints formatted data to stdout
- * @format: string that contains the format to print
- * Return: number of characters written
- */
-int _printf(char *format, ...)
+ * opFunction - Second function for _printf
+ * @cont: Contador
+ * @list: Lista arguments
+ * @tipos: Tipos que nos trae el JSON
+ * @format: Formato
+ * Return: Len
+*/
+int opFunction(int cont, va_list list, typedate tipos[], const char *format)
 {
-	int written = 0, (*structype)(char *, va_list);
-	char q[3];
-	va_list pa;
-
-	if (format == NULL)
-		return (-1);
-	q[2] = '\0';
-	va_start(pa, format);
-	_putchar(-1);
-	while (format[0])
+int i = 0, j = 0, band = 0, spaces = 0;
+while (format && format[i])
+{
+	band = 0;
+	if (format[i] == '%' && format[i + 1] == '\0')
+	return (-1);
+	else if (format[i] == '%' && format[i + 1] != '%')
 	{
-		if (format[0] == '%')
+		for (j = 0; j < 7; j++)
 		{
-			structype = driver(format);
-			if (structype)
+			if (format[i] == '%' && format[i + spaces + 1] == tipos[j].typec)
 			{
-				q[0] = '%';
-				q[1] = format[1];
-				written += structype(q, pa);
+				cont += tipos[j].fun(list);
+				i += spaces + 1;
+				band = 1;
 			}
-			else if (format[1] != '\0')
-			{
-				written += _putchar('%');
-				written += _putchar(format[1]);
-			}
-			else
-			{
-				written += _putchar('%');
-				break;
-			}
-			format += 2;
 		}
-		else
+		if (band == 0 && format[i + 2] != '\n')
 		{
-			written += _putchar(format[0]);
-			format++;
+			_putchar(format[i]);
+			cont++;
+
+		}
+		else if (band == 0 && format[i + 2] == '\n')
+		{
+			_putchar(format[i]);
+			cont++;
 		}
 	}
-	_putchar(-2);
-	return (written);
+	else if (format[i] == '%' && format[i + 1] == '%')
+	{
+		i += _putchar('%');
+		cont += 1;
+	}
+	else
+		cont += _putchar(format[i]);
+	i++;
+}
+	return (cont);
+}
+/**
+ * _printf - Printf!!
+ * @format: Format
+ * Return: len
+ */
+int _printf(const char *format, ...)
+{
+typedate tipos[] = {
+	{'s', printString}, {'c', printChar}, {'i', printInteger},
+	{'d', printDecimal}, {'b', printBinary}, {'o', printOctal},
+	{'u', printUnsigned}
+};
+va_list list;
+int cont = -1;
+
+if (format != NULL)
+{
+va_start(list, format);
+cont = 0;
+cont = opFunction(cont, list, tipos, format);
+va_end(list);
+}
+return (cont);
 }
