@@ -1,4 +1,4 @@
-#include "main.h"
+#include "holberton.h"
 /**
  * opFunction - Second function for _printf
  * @cont: Contador
