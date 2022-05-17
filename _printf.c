@@ -1,75 +1,57 @@
-#include "holberton.h"
-/**
- * opFunction - Second function for _printf
- * @cont: Contador
- * @list: Lista arguments
- * @tipos: Tipos que nos trae el JSON
- * @format: Formato
- * Return: Len
-*/
-int opFunction(int cont, va_list list, typedate tipos[], const char *format)
-{
-int i = 0, j = 0, band = 0, spaces = 0;
-while (format && format[i])
-{
-	band = 0;
-	if (format[i] == '%' && format[i + 1] == '\0')
-	return (-1);
-	else if (format[i] == '%' && format[i + 1] != '%')
-	{
-		for (j = 0; j < 7; j++)
-		{
-			if (format[i] == '%' && format[i + spaces + 1] == tipos[j].typec)
-			{
-				cont += tipos[j].fun(list);
-				i += spaces + 1;
-				band = 1;
-			}
-		}
-		if (band == 0 && format[i + 2] != '\n')
-		{
-			_putchar(format[i]);
-			cont++;
+#include "main.h"
+#include <stdlib.h>
+#include <stdarg.h>
 
-		}
-		else if (band == 0 && format[i + 2] == '\n')
-		{
-			_putchar(format[i]);
-			cont++;
-		}
-	}
-	else if (format[i] == '%' && format[i + 1] == '%')
-	{
-		i += _putchar('%');
-		cont += 1;
-	}
-	else
-		cont += _putchar(format[i]);
-	i++;
-}
-	return (cont);
-}
 /**
- * _printf - Printf!!
- * @format: Format
- * Return: len
+ * _printf - print anything
+ * @format: arguments
+ * Return: number of characters printed
  */
+
 int _printf(const char *format, ...)
 {
-typedate tipos[] = {
-	{'s', printString}, {'c', printChar}, {'i', printInteger},
-	{'d', printDecimal}, {'b', printBinary}, {'o', printOctal},
-	{'u', printUnsigned}
-};
-va_list list;
-int cont = -1;
+	va_list arguments;
+	const char *p;
+	int num = 0;
 
-if (format != NULL)
-{
-va_start(list, format);
-cont = 0;
-cont = opFunction(cont, list, tipos, format);
-va_end(list);
-}
-return (cont);
+	if (format == NULL)
+		return (-1);
+
+	va_start(arguments, format);
+
+	for (p = format; *p; p++)
+	{
+		if (*p == '%' && *p + 1 == '%')
+		{
+			_putchar(*p), num++;
+			continue;
+		}
+		else if (*p == '%' && *p + 1 != '%')
+		{
+			switch (*++p)
+			{
+				case 's':
+					num += fun_string(arguments);
+					break;
+				case 'c':
+					num += fun_character(arguments);
+					break;
+				case '%':
+					_putchar('%'), num++;
+					break;
+				case '\0':
+					return (-1);
+				case 'i':
+				case 'd':
+					num += fun_integer(arguments);
+					break;
+				default:
+					_putchar('%'), _putchar(*p), num += 2;
+			}
+		}
+		else
+			_putchar(*p), num++;
+	}
+va_end(arguments);
+return (num);
 }
