@@ -11,4 +11,5 @@ int _putchar(char c);
 int fun_string(va_list arguments);
 int fun_character(va_list arguments);
 int fun_integer(va_list arguments);
+char *_littleBuffer(int size);
 #endif
