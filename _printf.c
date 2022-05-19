@@ -7,68 +7,51 @@
  * @format: arguments
  * Return: number of characters printed
  */
+
 int _printf(const char *format, ...)
 {
+	va_list arguments;
 	const char *p;
-	unsigned int i;
-	int j;
-	int k = 0;
-	va_list conspec;
-	char *s;
+	int num = 0;
 
-	if (!format)
-	{
+	if (format == NULL)
 		return (-1);
-	}
-	va_start(conspec, format);
-	for (p = format; *p != '\0'; p++)
+
+	va_start(arguments, format);
+
+	for (p = format; *p; p++)
 	{
-		if (*p != '%')
+		if (*p == '%' && *p + 1 == '%')
 		{
-			_putchar(*p, &k);
+			_putchar(*p), num++;
 			continue;
 		}
-		p++;
-		switch (*p)
+		else if (*p == '%' && *p + 1 != '%')
 		{
-		case 'c':
-			i = va_arg(conspec, int);
-			_putchar(i, &k);
-			break;
-		case 's':
-			s = va_arg(conspec, char *);
-			_puts(s, &k);
-			break;
-		case '%':
-			_putchar('%', &k);
-			break;
-		case 'd':
-			j = va_arg(conspec, int);
-			_print_number(j, &k);
-			break;
-		case 'i':
-			j = va_arg(conspec, int);
-			_print_number(j, &k);
-			break;
-		case 'r':
-			s = va_arg(conspec, char *);
-			_rev_string(s, &k);
-			break;
-		case 'b':
-			i = va_arg(conspec, int);
-			_print_binary(i, &k);
-			break;
-		case 'R':
-			s = va_arg(conspec, char *);
-			_rot13(s, &k);
-			break;
-		case '\0':
-			return (-1);
-		default:
-			_putchar('%', &k);
-			_putchar(*p, &k);
+			switch (*++p)
+			{
+				case 's':
+					num += fun_string(arguments);
+					break;
+				case 'c':
+					num += fun_character(arguments);
+					break;
+				case '%':
+					_putchar('%'), num++;
+					break;
+				case '\0':
+					return (-1);
+				case 'i':
+				case 'd':
+					num += fun_integer(arguments);
+					break;
+				default:
+					_putchar('%'), _putchar(*p), num += 2;
+			}
 		}
+		else
+			_putchar(*p), num++;
 	}
-	va_end(conspec);
-	return (k);
+va_end(arguments);
+return (num);
 }
